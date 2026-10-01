@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Essencore India Conclave - Interactive Invitation</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Corporate Colors */
+            --navy-dark: #021124;
+            --navy-light: #051937;
+            --primary-gold: #D4AF37;
+            --dark-gold: #B38F24;
+            --light-gold: #F9E596;
+            --aurora-teal: #004d66;
+            
+            /* Text Colors */
+            --text-main: #FFFFFF;
+            --text-muted: #CBD5E1;
+            
+            /* Accents */
+            --md-red: #E53935;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #010812;
+            color: var(--text-main);
+            overflow: hidden; 
+            transition: background-color 1s ease;
+            height: 100vh; 
+            height: 100dvh; 
+        }
+        
+        .premium-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; 
+            height: 100vh;
+            height: 100dvh;
+            z-index: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        .premium-bg::before, .premium-bg::after {
+            content: '';
+            position: absolute;
+            width: 150vmax; height: 150vmax;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            animation: auroraRotate 30s linear infinite;
+        }
+        
+        .premium-bg::before {
+            background: radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.2) 0%, transparent 50%);
+            animation-direction: normal;
+        }
+        
+        .premium-bg::after {
+            background: radial-gradient(circle at 70% 60%, rgba(0, 77, 102, 0.4) 0%, transparent 60%);
+            animation-duration: 40s;
+            animation-direction: reverse;
+        }
+        @keyframes auroraRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        body.is-open-state .premium-bg {
+            opacity: 0; 
+        }
+
+        body.is-open-state {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-light) 100%);
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body.is-open-state::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 1;
+            z-index: -1;
+            pointer-events: none;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.03) 0px,
+                rgba(255, 255, 255, 0.03) 1px,
+                transparent 1px,
+                transparent 20px
+            );
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        #scene {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; 
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-perspective: 1500px;
+            perspective: 1500px;
+            z-index: 100;
+            -webkit-transition: opacity 0.5s ease, -webkit-transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transition: opacity 0.5s ease, transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 400px;
+            height: 250px;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            -webkit-transition: -webkit-transform 1s ease;
+            transition: transform 1s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .envelope-wrapper:hover {
+            transform: translateY(-5px);
+            -webkit-transform: translateY(-5px);
+        }
+
+        .envelope-back {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #051937, #021124);
+            border-radius: 5px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(212,175,55,0.4);
+            z-index: 1;
+        }
+
+        .envelope-front {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 150px solid #061c3d;
+            filter: drop-shadow(0 -5px 10px rgba(0,0,0,0.5));
+            pointer-events: none;
+        }
+        
+        .envelope-front::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; left: -200px;
+            border-left: 200px solid #08224a;
+            border-top: 125px solid transparent;
+            border-bottom: 125px solid transparent;
+            pointer-events: none;
+        }
+        
+        .envelope-front::before {
+            content: '';
+            position: absolute;
+            bottom: -150px; right: -200px;
+            border-right: 200px solid #08224a;
+            border-top: 125px solid transparent;
+            border-bottom: 125px solid transparent;
+            pointer-events: none;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 4;
+            -webkit-transform-origin: top;
+            transform-origin: top;
+            -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.3s;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.3s;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-top: 140px solid #061c3d;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
+        }
+        
+        .envelope-flap::after {
+            content: '';
+            position: absolute;
+            top: -140px; left: -198px;
+            border-left: 198px solid transparent;
+            border-right: 198px solid transparent;
+            border-top: 138px solid transparent;
+            border-top-color: rgba(212, 175, 55, 0.7);
+            z-index: -1;
+        }
+
+        .seal {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, var(--primary-gold) 40%, var(--dark-gold) 100%);
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+            pointer-events: none;
+            animation: none;
+        }
+        .envelope-flap {
+         -webkit-transform-origin: top; /* Added for iOS */
+          transform-origin: top;
+          -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.3s; /* Added for iOS */
+           transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.3s;
+        }
+        .envelope-wrapper.open .envelope-flap {
+            -webkit-transform: rotateX(180deg);
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-wrapper.open .letter-container {
+            -webkit-transform: translateY(-80px);
+            transform: translateY(-80px);
+            -webkit-transition: -webkit-transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;
+        }
+
+        #scene.zoom-out {
+            -webkit-transform: scale(3) translateY(200px);
+            transform: scale(3) translateY(200px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .letter-container {
+            position: absolute;
+            bottom: 10px;
+            left: 5%;
+            width: 90%;
+            height: 230px;
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-light));
+            border-radius: 4px;
+            z-index: 2;
+            transition: transform 0.5s ease;
+            -webkit-transition: -webkit-transform 0.5s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(212, 175, 55, 0.3);
+            overflow: hidden;
+        }
+
+        .final-card-wrapper {
+            position: relative;
+            max-width: 950px;
+            margin: 60px auto;
+            width: 92%;
+            background: rgba(2, 17, 36, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 8px;
+            padding: 60px 50px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 
+                        0 0 0 1px rgba(212, 175, 55, 0.2),
+                        inset 0 0 30px rgba(212, 175, 55, 0.05);
+            text-align: center;
+            opacity: 0;
+            display: none;
+            transform: translateY(30px);
+            -webkit-transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            -webkit-transition: opacity 0.8s ease, -webkit-transform 0.8s ease;
+            z-index: 200;
+        }
+        
+        body.is-open-state .final-card-wrapper {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            -webkit-transform: translateY(0);
+        }
+
+        .text-hover {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .text-hover:hover {
+            color: var(--light-gold);
+            transform: scale(1.02);
+            -webkit-transform: scale(1.02);
+            text-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Logo specific styling */
+        .logo-container {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.4s ease, filter 0.4s ease;
+            -webkit-transition: -webkit-transform 0.4s ease, filter 0.4s ease;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.15));
+            cursor: pointer;
+        }
+        .logo-container:hover {
+            transform: scale(1.03);
+            -webkit-transform: scale(1.03);
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+        }
+
+        /* Typography */
+        .pre-title {
+            color: var(--primary-gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        /* Smaller, refined main title */
+        .main-title {
+            font-size: 1.8rem;
+            color: #FFFFFF;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .sub-title {
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            color: var(--primary-gold);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .intro-text {
+            color: var(--text-muted);
+            max-width: 750px;
+            margin: 0 auto 50px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        .section-title {
+            color: #FFFFFF;
+            font-size: 1.5rem;
+            margin-bottom: 35px;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--primary-gold);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-gold);
+        }
+        .section-title:hover::after { width: 100%; }
+
+        .grid-3, .grid-4 {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            padding: 30px 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            -webkit-transform: translateY(-5px);
+            border-color: var(--primary-gold);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--primary-gold);
+        }
+
+        .icon-wrapper {
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.5s ease;
+        }
+        .icon-wrapper svg {
+            width: 26px; height: 26px;
+            fill: var(--primary-gold);
+            transition: fill 0.5s ease;
+        }
+        
+        .card:hover .icon-wrapper {
+            background: var(--primary-gold);
+            border-color: var(--primary-gold);
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+        .card:hover .icon-wrapper svg {
+            fill: var(--navy-dark);
+        }
+
+        .card h4 {
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+        .card:hover h4 { color: var(--light-gold); }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .klevv-banner {
+            background: linear-gradient(145deg, rgba(5,15,30,0.9) 0%, rgba(2,6,15,0.95) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            padding: 40px 30px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 15px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+        }
+        .klevv-banner:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .klevv-title-text {
+            color: #FFFFFF;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .ram-images-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ram-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            -webkit-transition: -webkit-transform 0.4s ease, box-shadow 0.4s ease;
+            object-fit: contain;
+            background: #000;
+        }
+        
+        .ram-img:hover {
+            transform: scale(1.03);
+            -webkit-transform: scale(1.03);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .footer strong {
+            color: #FFFFFF;
+            display: block;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+        }
+        .footer strong:hover {
+            color: var(--primary-gold);
+            transform: scale(1.02);
+            -webkit-transform: scale(1.02);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        @media (min-width: 769px) {
+            .ram-images-container {
+                flex-direction: row;
+            }
+            .ram-img {
+                max-width: 45%;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .final-card-wrapper { padding: 40px 20px; }
+        }
+        @media (max-width: 768px) {
+            .grid-3 { grid-template-columns: repeat(1, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .grid-4 { grid-template-columns: 1fr; }
+            .main-title { font-size: 1.4rem; }
+            .sub-title { font-size: 0.75rem; letter-spacing: 3px; }
+            
+            .envelope-wrapper { width: 300px; height: 187px; }
+            .envelope-front {
+                border-left: 150px solid transparent;
+                border-right: 150px solid transparent;
+                border-bottom: 110px solid #061c3d;
+            }
+            .envelope-front::after { bottom: -110px; left: -150px; border-left: 150px solid #08224a; border-top: 93px solid transparent; border-bottom: 93px solid transparent;}
+            .envelope-front::before { bottom: -110px; right: -150px; border-right: 150px solid #08224a; border-top: 93px solid transparent; border-bottom: 93px solid transparent;}
+            .envelope-flap {
+                border-left: 150px solid transparent; border-right: 150px solid transparent; border-top: 105px solid #061c3d;
+            }
+            .envelope-flap::after { top: -105px; left: -148px; border-left: 148px solid transparent; border-right: 148px solid transparent; border-top: 103px solid transparent; border-top-color: rgba(212, 175, 55, 0.7); }
+            .letter-container { height: 170px; }
+            .seal { top: 90px; width: 60px; height: 60px; font-size: 0.5rem;}
+        }
+        
+        .svg-defs { display: none; }
+    </style>
+</head>
+<body>
+<div class="premium-bg"></div>
+
+    <!-- Initial Envelope Scene -->
+    <div id="scene">
+        <div class="envelope-wrapper" id="envelope">
+            <div class="envelope-back"></div>
+            
+            <div class="letter-container">
+                <div style="padding: 10px 20px 0px 20px; text-align: center; color: var(--primary-gold);">
+                    <!-- Top Envelope Logo -->
+                    <img src="https://www.shutterstock.com/image-photo/colours-sunset-skyscape-nature-composition-natural-2464129821" alt="MD Computers Logo" style="width: 100%; height: auto; max-height: 110px; margin-top: 0px; object-fit: contain;">
+                    <div style="font-size: 0.7rem; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px;">Essencore India Conclave</div>
+                </div>
+            </div>
+            
+            <div class="envelope-front"></div>
+            <div class="envelope-flap" id="flap"></div>
+            <div class="seal" id="seal">Click<br>to open</div>
+        </div>
+    </div>
+
+    <!-- Final Full Card View -->
+    <div class="final-card-wrapper" id="mainCard">
+        
+        <!-- ========================================== -->
+        <!-- Main Card Logo Mobile Fixed Here           -->
+        <!-- ========================================== -->
+        <div class="logo-container text-hover">
+            <img src="https://mdcomputers.in/image/catalog/2026/sep/30-09-26/logo.png" alt="MD Computers Logo" style="width: 100%; max-width: 400px; height: auto; padding: 10px; object-fit: contain;">
+        </div>
+        <!-- ========================================== -->
+         <div><h1 class="main-title text-hover"><u>Hi XRIG</u></h1></div> 
+        <div class="pre-title text-hover">— You are cordially invited to —</div>
+        <h1 class="main-title text-hover">Essencore India Conclave</h1>
+        <div class="sub-title text-hover">Collaborate &bull; Connect &bull; Grow</div>
+
+        <p class="intro-text text-hover">
+            We are delighted to invite you to the Essencore India Conclave — an exclusive evening in collaboration with Essencore, bringing together innovation, technology, partnerships and growth within the evolving technology ecosystem.
+        </p>
+
+        <h2 class="section-title text-hover">What to Expect</h2>
+        <div class="grid-3">
+            <div class="card">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,12V10L23,12V2H17V9.45L13,7.45V2H7V9.45L3,7.45V2H1V22H23V12M19,14H21V16H19V14M19,18H21V20H19V18M15,14H17V16H15V14M15,18H17V20H15V18M11,14H13V16H11V14M11,18H13V20H11V18M7,14H9V16H7V14M7,18H9V20H7V18M3,14H5V16H3V14M3,18H5V20H3V18Z"/></svg>
+                </div>
+                <h4>Make In India</h4>
+                <p>Solutions</p>
+            </div>
+            <div class="card">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7,4A3,3 0 0,0 4,7V17A3,3 0 0,0 7,20H17A3,3 0 0,0 20,17V7A3,3 0 0,0 17,4H7M7,6H17A1,1 0 0,1 18,7V17A1,1 0 0,1 17,18H7A1,1 0 0,1 6,17V7A1,1 0 0,1 7,6M9,9V15H15V9H9M11,11H13V13H11V11M2,7H4V9H2V7M20,7H22V9H20V7M2,11H4V13H2V11M20,11H22V13H20V11M2,15H4V17H2V15M20,15H22V17H20V15M7,2V4H9V2H7M15,2V4H17V2H15M11,2V4H13V2H11M7,20V22H9V20H7M15,20V22H17V20H15M11,20V22H13V20H11Z"/></svg>
+                </div>
+                <h4>Showcase</h4>
+                <p>KLEVV Gaming Memory</p>
+            </div>
+            <div class="card">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <h4>Experience</h4>
+                <p>Industry Networking & Dinner</p>
+            </div>
+        </div>
+
+        <div class="klevv-banner">
+            <h3 class="klevv-title-text text-hover">KLEVV Gaming Memory Showcase</h3>
+            <div class="ram-images-container">
+                <img src="https://mdcomputers.in/image/catalog/2026/sep/30-09-26/2.png" alt="KLEVV BOLT X" class="ram-img">
+                <img src="https://mdcomputers.in/image/catalog/2026/sep/30-09-26/Klevv_Product%20Image_Memory_CRAS%20V%20RGB_01L.png" alt="KLEVV CRAS V RGB" class="ram-img">
+            </div>
+        </div>
+
+        <h2 class="section-title text-hover">Event Details</h2>
+        <div class="grid-4">
+            <div class="card text-hover">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/></svg>
+                </div>
+                <h4>Date</h4>
+                <p>Wednesday,<br>October 7, 2026</p>
+            </div>
+            
+            <div class="card text-hover">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
+                </div>
+                <h4>Time</h4>
+                <p>5:30 PM –<br>10:00 PM</p>
+            </div>
+            
+            <div class="card text-hover">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/></svg>
+                </div>
+                <h4>Venue</h4>
+                <p>Shangri-La Ballroom,<br>Shangri-La Eros New Delhi</p>
+            </div>
+            
+            <div class="card text-hover">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,3L2,12H5V20H19V12H22L12,3M12,7.7C14.1,7.7 15.8,9.4 15.8,11.5C15.8,14.5 12,18 12,18C12,18 8.2,14.5 8.2,11.5C8.2,9.4 9.9,7.7 12,7.7M12,10A1.5,1.5 0 0,0 10.5,11.5A1.5,1.5 0 0,0 12,13A1.5,1.5 0 0,0 13.5,11.5A1.5,1.5 0 0,0 12,10Z"/></svg>
+                </div>
+                <h4>Address</h4>
+                <p>19 Ashoka Road, Connaught Place,<br>New Delhi – 110001</p>
+            </div>
+        </div>
+
+        <div class="footer text-hover">
+Looking forward of your gracious presence with
+    <div class="logo-container" style="margin-bottom: 20px;">
+        <img src="https://mdcomputers.in/image/catalog/2026/sep/30-09-26/logo.png" alt="MD Computers Logo" style="width: 100%; max-width: 300px; height: auto; padding: 10px; object-fit: contain;">
+    </div>
+          
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const envelope = document.getElementById('envelope');
+            const scene = document.getElementById('scene');
+            const bgMusic = document.getElementById('bgMusic'); 
+            
+            function openEnvelope(e) {
+                
+                if (e && e.type === 'touchstart') {
+                    e.preventDefault(); 
+                }
+
+                if(envelope.classList.contains('open')) return;
+
+                if(bgMusic) {
+                    bgMusic.play().catch(function(error) {
+                        console.log("Audio playback failed:", error);
+                    });
+                }
+
+                envelope.classList.add('open');
+
+                setTimeout(() => {
+                    scene.classList.add('zoom-out');
+                }, 900);
+
+                setTimeout(() => {
+                    scene.style.display = 'none';
+                    document.body.classList.add('is-open-state');
+                }, 1400); 
+            }
+
+            envelope.addEventListener('click', openEnvelope);
+            envelope.addEventListener('touchstart', openEnvelope, { passive: false });
+        });
+    </script>
+</body>
+</html>
